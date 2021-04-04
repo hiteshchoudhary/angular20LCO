@@ -1,0 +1,39 @@
+const querystring = require('querystring')
+const AWS = require('aws-sdk')
+
+var ses = new AWS.SES();
+
+exports.handler = function(event, context, callback) {
+    
+    const params = querystring.parse(event.body)
+    
+    var emailParams = {
+        Destination: {
+            ToAddresses: ["team@learncodeonline.in"]
+        },
+        Message: {
+            Body: {
+                Text: {
+                    Data: "Hello from SES Amazon"
+                }
+            },
+            Subject: {
+                Data: "You got new email from SES"
+            }
+        },
+        Source: "team@learncodeonline.in"
+    }
+    
+    ses.sendEmail(emailParams, function(err, data){
+        if (err) console.log(err, err.stack);
+        else console.log(data)
+    })
+    
+    const response = {
+        statusCode: 200,
+        headers: {'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify('Thanks ' + params['name'] +  ' for contacting! '),
+    };
+    //return response;
+    callback(null, response);
+};
